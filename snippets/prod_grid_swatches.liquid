@@ -1,0 +1,142 @@
+{% render 'swatch_css' %}
+{% comment %}
+  Set the extension of your color files below. Use 'png', 'jpeg', 'jpg' or 'gif'.
+{% endcomment %}
+{% assign file_extension = 'png' %}
+
+{% if prod_grid_swatches == blank %}
+  <div class="swatch error">
+    <p>You must include the snippet swatch.liquid with the name of a product option.</p>
+    <p>
+      Use: <code>{% raw %}{% include 'prod_grid_swatches' with 'name of your product option here' %}{% endraw %}</code>
+    </p>
+    <p>
+      Example: <code>{% raw %}{% include 'prod_grid_swatches' with 'Color' %}{% endraw %}</code>
+    </p>
+  </div>
+{% else %}
+  {% assign found_option = false %}
+  {% assign is_color = false %}
+  {% assign option_index = 0 %}
+  {% for option in product.options %}
+    {% if option == prod_grid_swatches %}
+      {% assign found_option = true %}
+      {% assign option_index = forloop.index0 %}
+      <style>
+        label[for="product-select-option-{{ option_index }}"] { display: none; }
+        #product-select-option-{{ option_index }} { display: none; }
+        #product-select-option-{{ option_index }} + .custom-style-select-box { display: none !important; }
+      </style>
+      <script>
+        $(window).load(function () {
+          $('.selector-wrapper:eq({{ option_index }})').hide();
+        });
+      </script>
+      {% assign downcased_option = prod_grid_swatches | downcase %}
+      {% if downcased_option contains 'color' or downcased_option contains 'colour' %}
+        {% assign is_color = true %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+
+  {% unless found_option %}
+    <div class="swatch error">
+      <p>
+        You included the snippet swatch.liquid with the name of a product option —
+        <code>'{{ prod_grid_swatches }}'</code> — that does not belong to your product.
+      </p>
+      <p>
+        Use <code>{% raw %}{% include 'prod_grid_swatches' with 'name of your product option here' %}{% endraw %}</code>
+      </p>
+      <p>
+        Example: <code>{% raw %}{% include 'prod_grid_swatches' with 'Color' %}{% endraw %}</code>
+      </p>
+      <p>
+        <strong>This is case-sensitive!</strong> Do not put in <code>'color'</code> if your product option name is
+        <code>'Color'</code>.
+      </p>
+    </div>
+  {% else %}
+    <div class="swatch clearfix" data-option-index="{{ option_index }}">
+      <div class="form__label">{{ swatch }}</div>
+      {% assign values = '' %}
+      {% for variant in product.variants %}
+        {% assign value = variant.options[option_index] %}
+        {% unless values contains value %}
+          {% assign values = values | join: ',' %}
+          {% assign values = values | append: ',' | append: value %}
+          {% assign values = values | split: ',' %}
+          {% unless variant.available %}
+            {% assign variantStatus = 'soldout' %}
+          {% else %}
+            {% assign variantStatus = 'available' %}
+          {% endunless %}
+          <div
+            data-value="{{ value | escape }}"
+            data-color="{{ value | handle }}"
+            class="swatch-element {% if is_color %}color {% endif %}{{ value | handle }} {{ variantStatus }}"
+          >
+            {% if is_color %}
+              <div class="tooltip">{{ value }}</div>
+            {% endif %}
+            <input
+              id="swatch-{{ option_index }}-{{ value | handle }}-{{ variant.id }}-{{ prod_index }}"
+              class="swatches__input"
+              data-target="product-grid-image-{{ product.id }}-{{ prod_index }}"
+              data-target-secondary="product-grid-image-secondary-{{ product.id }}-{{ prod_index }}"
+              data-handle="{{ product.handle }}"
+              type="radio"
+              name="option-{{ product.id }}-{{ prod_index }}"
+              value="{{ value | escape }}"
+              {% if forloop.first %}
+                checked
+              {% endif %}
+            >
+            {% if is_color %}
+              <label for="swatch-{{ option_index }}-{{ value | handle }}-{{ variant.id }}-{{ prod_index }}">
+                <div class="needsclick">
+                  {% comment %} <span class="color-{{ value | handle }} needsclick" style="background-color: {{ value | split: ' ' | last | handle }}; background-image: url({{ value | handle | append: '.' | append: file_extension | asset_url }})"></span>  {% endcomment %}
+                  <span class="color-{{ value | handle }} needsclick">
+                    <img src="{{- variant.image | img_url: 'medium' -}}">
+                  </span>
+                </div>
+                <img class="crossed-out" src="{{ 'soldout.png' | asset_url }}">
+              </label>
+            {% else %}
+              <label for="swatch-{{ option_index }}-{{ value | handle }}-{{ forloop.index }}">
+                {{ value }}
+                <img class="crossed-out" src="{{ 'soldout.png' | asset_url }}">
+              </label>
+            {% endif %}
+          </div>
+        {% endunless %}
+        {% comment %}
+          {% if variant.available %}
+            <p class="new-testinggg">is available</p>
+          {% else %}
+            <p>sold</p>
+          {% endif %}
+        {% endcomment %}
+        {% comment %}
+          {% if variant.available %}
+            <script>
+              jQuery('.swatch[data-option-index="{{ option_index }}"] .{{ value | handle }}')
+                .removeClass('soldout')
+                .addClass('available')
+                .find(':radio')
+                .removeAttr('disabled');
+            </script>
+          {% endif %}
+        {% endcomment %}
+      {% endfor %}
+    </div>
+  {% endunless %}
+{% endif %}
+<div class="variant_selector" style="display:none;">
+  {% for variant in product.variants %}
+    <option
+      class="color-{{ variant.option1 | handle }} {% if variant.available %}available {% else %}soldout{% endif %}"
+      variant="{{ variant.title | handle }}"
+    ></option>
+  {% endfor %}
+</div>

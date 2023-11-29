@@ -1,0 +1,33 @@
+<section class="simple_img_section">
+ <img class="small-hide" style="width:100%" src="{{ section.settings.desk_img | img_url: 'master' }}">
+ <img class="medium-up-hide" style="width:100%" src="{{ section.settings.mob_img | img_url: 'master' }}"> 
+</section>  
+
+{% schema %}
+{
+    "name": "simple_img_section",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "desk_img",
+        "label": "desktop image"
+      },
+      {
+        "type": "image_picker",
+        "id": "mob_img",
+        "label": "mobile image"
+      }
+   ],
+   "presets": [
+     {
+       "name": "simple_img_section"
+     }
+   ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

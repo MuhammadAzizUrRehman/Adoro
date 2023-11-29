@@ -1,0 +1,119 @@
+<style>
+.collapsible {
+  background-color: White;
+  color: Black;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  font-family: 'Caviar Dreams', sans-serif;
+  font-weight: bold;
+}
+
+.active, .collapsible:hover {
+  background-color: white;
+}
+
+.collapsible:after {
+  content: '\002B';
+  color: black;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2212";
+}
+
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+  background-color: white;
+  font-family: Roboto !important;
+  border-bottom: 1px solid lightgrey;
+}
+.collapsible_all hr {
+  margin: 0;
+}
+.collapsible_all {
+    padding: 0 80px;
+    margin-bottom: 50px;
+}
+@media screen and (max-width: 768px) {
+    .collapsible_all {
+        padding: 0;
+    }
+}
+.collapsible_all h1 {
+    text-align: center;
+}
+</style>
+
+<div class="collapsible_all">
+<h1>{{ section.settings.heading }}</h1>
+{% for block in section.blocks%}
+<button class="collapsible">{{ block.settings.button_heading }}</button>
+<div class="content">
+  <p>{{ block.settings.button_content }}</p>
+</div>
+{% endfor %}
+</div>
+
+{% javascript %}
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.maxHeight){
+      content.style.maxHeight = null;
+    } else {
+      content.style.maxHeight = content.scrollHeight + "px";
+    } 
+  });
+}
+{% endjavascript %}
+
+{% schema %}
+   {
+    "name": "Collapsible Content",
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading"
+      }
+    ],
+    "blocks": [
+              {
+                "type": "text",
+                "name": "Image With Text",
+                "settings": [
+                  {
+                    "type": "text",
+                    "id": "button_heading",
+                    "label": "Question"
+                  },
+                  {
+                     "type": "richtext",
+                     "id": "button_content",
+                     "label": "Answer"
+                  }
+                ]
+              }
+            ],
+    "presets": [
+      {
+        "name": "Custom Collapsible Content"
+      }
+    ]
+  }
+{% endschema %}

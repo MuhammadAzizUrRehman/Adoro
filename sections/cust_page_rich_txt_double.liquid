@@ -1,0 +1,450 @@
+<link rel="stylesheet" href="{{ 'component-rte.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'section-rich-text.css' | asset_url }}" media="print" onload="this.media='all'">
+
+<noscript>{{ 'component-rte.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'section-rich-text.css' | asset_url | stylesheet_tag }}</noscript>
+
+{%- style -%}
+  .custom_page_rich_txt_dble .rich-text__text:not(:last-child) {
+    margin-top: 0;
+        margin-bottom: 60px;
+}
+    .custom_page_rich_txt_dble .rich-text__heading {
+    margin-bottom: 35px;
+}
+  .custom_page_rich_txt_dble .rich-text__heading.rte span {
+    font-size: 2.2rem;
+}
+  .custom_page .custom_page_rich_txt_dble .rich-text__blocks {
+    background: #fff;
+    margin-bottom: 0;
+    max-width: calc(50% - 15px);
+    padding: 39px 70px 77px;
+}
+  .custom_page .custom-rich-text h2.rich-text__heading.rte.h1 {
+    margin-bottom: 50px;
+}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+  .product--template .section-{{ section.id }}-padding{
+    padding-top: {{ section.settings.padding_top_mob }}px;
+    padding-bottom: {{ section.settings.padding_bottom_mob }}px;
+    
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+    
+  }
+{%- endstyle -%}
+
+<span class="js-on-show" data-onshow-target=".isolate" data-onshow-class="animation--fade-up animated">
+<div class="custom_page_rich_txt_dble isolate animation--on-show{% unless section.settings.full_width %} page-width{% endunless %}">
+  <div class="rich-text content-container color-{{ section.settings.color_scheme }} gradient{% if section.settings.full_width %} rich-text--full-width content-container--full-width{% endif %} section-{{ section.id }}-padding">
+    <div class="rich-text__wrapper rich-text__wrapper--{{ section.settings.desktop_content_position }}{% if section.settings.full_width %} page-width{% endif %}">
+      {%- for block in section.blocks -%}
+        {% if block.type == 'first_tile' %}
+      <div class="rich-text__blocks {{ section.settings.content_alignment }}">                              
+              <h2 class="rich-text__heading rte {{ block.settings.heading_size }}" {{ block.shopify_attributes }}>
+                {{ block.settings.heading | replace: 'p>', 'span>' }}
+              </h2>
+            
+              <p class="rich-text__caption layout-section__eyebrow {{ block.settings.text_style }} {{ block.settings.text_style }}--{{ block.settings.text_size }}" {{ block.shopify_attributes }}>
+                {{ block.settings.caption | escape }}
+              </p>            
+              <div class="rich-text__text rte" {{ block.shopify_attributes }}>
+                {{ block.settings.text }}
+              </div> 
+
+              <p class="rich-text__caption layout-section__eyebrow {{ block.settings.text_style }} {{ block.settings.text_style }}--{{ block.settings.text_size }}" {{ block.shopify_attributes }}>
+                {{ block.settings.caption_2 | escape }}
+              </p>            
+              <div class="rich-text__text rte" {{ block.shopify_attributes }}>
+                {{ block.settings.text_2 }}
+              </div>
+
+              <p class="rich-text__caption layout-section__eyebrow {{ block.settings.text_style }} {{ block.settings.text_style }}--{{ block.settings.text_size }}" {{ block.shopify_attributes }}>
+                {{ block.settings.caption_3 | escape }}
+              </p>            
+              <div class="rich-text__text rte" {{ block.shopify_attributes }}>
+                {{ block.settings.text_3 }}
+              </div>
+      </div>
+      {% endif %} 
+      {% if block.type == 'second_tile' %}
+        <div class="rich-text__blocks {{ section.settings.content_alignment }}">                   
+              <h2 class="rich-text__heading rte {{ block.settings.heading_size }}" {{ block.shopify_attributes }}>
+                {{ block.settings.heading | replace: 'p>', 'span>' }}
+              </h2>
+            
+              <p class="rich-text__caption layout-section__eyebrow {{ block.settings.text_style }} {{ block.settings.text_style }}--{{ block.settings.text_size }}" {{ block.shopify_attributes }}>
+                {{ block.settings.caption | escape }}
+              </p>            
+              <div class="rich-text__text rte" {{ block.shopify_attributes }}>
+                {{ block.settings.text }}
+              </div>
+
+              <p class="rich-text__caption layout-section__eyebrow {{ block.settings.text_style }} {{ block.settings.text_style }}--{{ block.settings.text_size }}" {{ block.shopify_attributes }}>
+                {{ block.settings.caption_2 | escape }}
+              </p>            
+              <div class="rich-text__text rte" {{ block.shopify_attributes }}>
+                {{ block.settings.text_2 }}
+              </div>
+
+              <p class="rich-text__caption layout-section__eyebrow {{ block.settings.text_style }} {{ block.settings.text_style }}--{{ block.settings.text_size }}" {{ block.shopify_attributes }}>
+                {{ block.settings.caption_3 | escape }}
+              </p>            
+              <div class="rich-text__text rte" {{ block.shopify_attributes }}>
+                {{ block.settings.text_3 }}
+              </div>
+      </div>
+      {% endif %}   
+    {%- endfor -%}
+    </div>
+  </div>
+</div>
+</span>
+
+{% schema %}
+{
+  "name": "cust rich_txt double",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "desktop_content_position",
+      "label": "desk cont pos",
+      "options": [
+        {
+          "value": "left",
+          "label": "left"
+        },
+        {
+          "value": "center",
+          "label": "center"
+        },
+        {
+          "value": "right",
+          "label": "right"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "cont align",
+      "options": [
+        {
+          "value": "left",
+          "label": "left"
+        },
+        {
+          "value": "center",
+          "label": "center"
+        },
+        {
+          "value": "right",
+          "label": "right"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "colr scheme",
+      "options": [
+        {
+          "value": "accent-1",
+          "label": "accent-1"
+        },
+        {
+          "value": "accent-2",
+          "label": "accent-2"
+        },
+        {
+          "value": "background-1",
+          "label": "background-1"
+        },
+        {
+          "value": "background-2",
+          "label": "background-2"
+        },
+        {
+          "value": "inverse",
+          "label": "inverse"
+        }
+      ],
+      "default": "background-1",
+      "label": "background-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "default": true,
+      "label": "full_width"
+    },
+    {
+      "type": "header",
+      "content": "padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "padding top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "padding bottom",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mob",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "mobile pad top",
+      "default": 40,
+      "info": "only for prod page"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mob",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "mobile pad bot",
+      "default": 52,
+      "info": "only for prod page"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "first_tile",
+      "name": "firt_tile",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "heading",
+          "label": "heading"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "heading size",
+          "options": [
+            {
+              "value": "h2",
+              "label": "small"
+            },
+            {
+              "value": "h1",
+              "label": "medium"
+            },
+            {
+              "value": "h0",
+              "label": "large"
+            },
+            {
+              "value": "hxl",
+              "label": "larger"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "default": "Add a tagline",
+          "label": "text tagline"
+        },
+        {
+          "type": "select",
+          "id": "text_style",
+          "label": "text style",
+          "options": [
+            {
+              "value": "subtitle",
+              "label": "subtitle"
+            },
+            {
+              "value": "caption-with-letter-spacing",
+              "label": "caption"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "label": "text size",
+          "options": [
+            {
+              "value": "small",
+              "label": "small"
+            },
+            {
+              "value": "medium",
+              "label": "medium"
+            },
+            {
+              "value": "large",
+              "label": "large"
+            }
+          ]
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "paragraph"
+        },
+        {
+        "type": "text",
+        "id": "caption_2",
+        "default": "Add a tagline",
+        "label": "text tagline 2"
+      },
+      {
+        "type": "richtext",
+        "id": "text_2",
+        "label": "paragraph 2"
+      },
+        {
+        "type": "text",
+        "id": "caption_3",
+        "default": "Add a tagline",
+        "label": "text tagline 3"
+      },
+      {
+        "type": "richtext",
+        "id": "text_3",
+        "label": "paragraph 3"
+      }
+      ]
+    },
+    {
+      "type": "second_tile",
+      "name": "second_tile",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "heading",
+          "label": "heading"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "heading size",
+          "options": [
+            {
+              "value": "h2",
+              "label": "small"
+            },
+            {
+              "value": "h1",
+              "label": "medium"
+            },
+            {
+              "value": "h0",
+              "label": "large"
+            },
+            {
+              "value": "hxl",
+              "label": "larger"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "default": "Add a tagline",
+          "label": "text tagline"
+        },
+        {
+          "type": "select",
+          "id": "text_style",
+          "label": "text style",
+          "options": [
+            {
+              "value": "subtitle",
+              "label": "subtitle"
+            },
+            {
+              "value": "caption-with-letter-spacing",
+              "label": "caption"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "label": "text size",
+          "options": [
+            {
+              "value": "small",
+              "label": "small"
+            },
+            {
+              "value": "medium",
+              "label": "medium"
+            },
+            {
+              "value": "large",
+              "label": "large"
+            }
+          ]
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "paragraph"
+        },
+        {
+        "type": "text",
+        "id": "caption_2",
+        "default": "Add a tagline",
+        "label": "text tagline 2"
+      },
+      {
+        "type": "richtext",
+        "id": "text_2",
+        "label": "paragraph 2"
+      },
+        {
+        "type": "text",
+        "id": "caption_3",
+        "default": "Add a tagline",
+        "label": "text tagline 3"
+      },
+      {
+        "type": "richtext",
+        "id": "text_3",
+        "label": "paragraph 3"
+      }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "cust rich_txt double"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,69 @@
+{% render 'product_model_custom' %}
+
+
+<aside class="modal product-modal background-{{ section.settings.background_style }}">
+  <div class="modal__container">
+    <div class="modal__header">
+      <h3 class="savings__title">How are our prices possible?</h3>
+
+      <span class="js-on-click modal__close" data-onclick-target="html" data-onclick-class="modal--open product-is-open">
+        <span class="icon icon--close"></span>
+      </span>
+    </div>
+
+    <div class="modal__content">
+      <section class="savings__wrapper">
+        <p class="savings__description">Unlike traditional retail, we manage all aspects of production, from design to quality assurance. By offering products directly to you, we are able to eliminate costly factors such as middlemen, retail operations, inventory, and high overhead. All the savings are passed on to you.</p>
+
+        <div class="savings__prices">
+          <div class="savings__price">
+            <span class="savings-price__name">ADORO</span>
+            <span class="savings-price__box">
+              <span class="savings-price__box-steps">Factory
+                <span class="icon icon--thin-arrow-right"></span> You
+              </span>
+
+              <span class="savings-price__price medium-up-hide">$</span>
+            </span>
+            <span class="savings-price__price small-hide"><span class="icon icon--large-thin-arrow-right large-icon"></span> $</span>
+          </div>
+
+          <div class="savings__price">
+            <span class="savings-price__name">TRADITIONAL RETAIL</span>
+            <span class="savings-price__box">
+              <span class="savings-price__box-steps">Factory
+                <span class="icon icon--thin-arrow-right"></span> Sourcing Agent
+                <span class="icon icon--thin-arrow-right"></span> Brand
+                <span class="icon icon--thin-arrow-right"></span> Distributor
+                <span class="icon icon--thin-arrow-right"></span> Retailer
+                <span class="icon icon--thin-arrow-right"></span> You
+              </span>
+
+              <span class="savings-price__price medium-up-hide two">$$$</span>
+            </span>
+            <span class="savings-price__price small-hide"><span class="icon icon--large-thin-arrow-right large-icon"></span> $$$</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</aside>
+{% schema %}
+  {
+    "name": "product model",
+    "settings": [
+        
+    ],
+    "presets":[
+      {
+      "name": "custom product model"
+        }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

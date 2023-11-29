@@ -1,0 +1,703 @@
+{% comment %}
+    Renders facets (filtering and sorting)
+
+    Accepts:
+    - results: {Object} Collection or Search object
+    - enable_filtering: {Boolean} Show filtering when true
+    - enable_sorting: {Boolean} Show sorting when true
+    - filter_type: {String} Type of filter
+
+    Usage:
+    {% render 'facets', results: collection, enable_filtering: true, enable_sorting: true, filter_type: 'vertical' %}
+{% endcomment %}
+
+{{ 'component-show-more.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign sort_by = results.sort_by | default: results.default_sort_by
+  assign total_active_values = 0
+  if results.url
+    assign results_url = results.url
+  else
+    assign terms = results.terms | escape
+    assign results_url = '?q=' | append: terms | append: '&options%5Bprefix%5D=last&sort_by=' | append: sort_by
+  endif
+-%}
+
+<div class="facets-container js-all-products__filters{% if filter_type == 'drawer' %} facets-container-drawer{% endif %}">
+  {%- if filter_type == 'vertical' or filter_type == 'horizontal' -%}
+<!--     tag base filters -->
+ <div class="custom_filters small-hide">
+      {%- for block in blocks -%}
+  {%- assign collapsed_state = block.settings.collapsed -%}
+
+  <div class="collection-sidebar__group--{{ block.id }}" {{ block.shopify_attributes }}>
+    {%- if block.type == 'tags_group' or 'tags_all' -%}
+      {%- assign tags_to_display = false -%}
+      {% case block.type %}
+        {% when 'tags_group' %}
+          {%- assign split_tag_list = block.settings.tag_list | newline_to_br | split:'<br />' -%}
+          {%- assign tags_to_display = split_tag_list -%}
+        {% when 'tags_all' %}
+          {%- assign tags_to_display = collection.all_tags -%}
+      {% endcase %}
+      {% comment %}
+        Check if we have underscore-defined tag groups
+      {% endcomment %}
+      {%- assign underscore_groups = false -%}
+      {%- if block.type == 'tags_all' -%}
+        {%- assign categories = '' -%}
+        {%- for tag in tags_to_display -%}
+          {%- render 'filter-out-custom-tags' -%}
+          {%- if tag contains '_' -%}
+            {%- assign underscore_groups = true -%}
+            {% capture categories %}{% unless categories == blank %}{{ categories }}|{% endunless %}{{ tag | split: '_' | first }}{% endcapture %}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- assign cat_array = categories | split: '|' | uniq -%}
+      {%- endif -%}
+
+      {% comment %}
+        Output groups of collapsible tag groups
+      {% endcomment %}
+      {%- if underscore_groups -%}
+        {%- for cat_item in cat_array -%}
+          {%- assign cat_handle = cat_item | handleize -%}
+          <div class="collection-sidebar__group collection-sidebar__group--{{ cat_handle }}">
+            {%- render 'collection-sidebar-filter-trigger', title: cat_item, index: forloop.index, id: cat_handle -%}
+
+            <div
+              id="{{ location }}-{{ forloop.index }}-{{ cat_handle }}"
+              class="collapsible-content collapsible-content--sidebar{% unless collapsed_state %} is-open{% endunless %}"
+              {% unless collapsed_state %}style="height: auto;"{% endunless %}>
+              <div class="collapsible-content__inner">
+                {% comment %}
+                  Tag and checkbox markup
+                {% endcomment %}
+                {%- assign tag_count = 0 -%}
+                <ul class="no-bullets tag-list{% if section.settings.tags_combine %} tag-list--checkboxes{% endif %}">
+                  {%- for tag in tags_to_display -%}
+                    {%- render 'filter-out-custom-tags' -%}
+                    {%- assign cat = tag | split: '_' | first -%}
+                    {%- if cat != tag and cat_item == cat -%}
+                      {% comment %}
+                        Strip out tag category prefix
+                      {% endcomment %}
+                      {%- assign tag_name = tag | strip -%}
+                      {%- assign tag_text = tag_name | remove_first: cat_item | remove_first: '_' -%}
+                      {%- assign tag_count = tag_count | plus: 1 -%}
+
+                      {%- if section.settings.tags_combine -%}
+                        {%- if current_tags contains tag_name -%}
+                          <li class="tag tag--active">
+                            {{ tag_text | link_to_remove_tag: tag_name | replace: 'title=', 'class="js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                          </li>
+                        {%- else -%}
+                          <li class="tag">
+                            {{ tag_text | link_to_add_tag: tag_name | replace: 'title=', 'class="js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                          </li>
+                        {%- endif -%}
+                      {%- else -%}
+                        <li class="tag{% if current_tags contains tag_name %} tag--active{% endif %}">
+                          {{ tag_text | link_to_tag: tag | replace: 'title=', 'class="js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                        </li>
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                </ul>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        {% comment %}
+          Output a list of all
+        {% endcomment %}
+        {%- if tags_to_display -%}
+          <div class="collection-sidebar__group">
+            {%- render 'collection-sidebar-filter-trigger', title: block.settings.title, index: forloop.index -%}
+            <div
+              id="{{ location }}-{{ forloop.index }}"
+              class="collapsible-content collapsible-content--sidebar{% unless collapsed_state %} is-open{% endunless %}"
+              {% unless collapsed_state %}style="height: auto;"{% endunless %}>
+              <div class="collapsible-content__inner">
+                {% comment %}
+                  Tag and checkbox markup
+                {% endcomment %}
+                {%- assign tag_count = 0 -%}
+                <ul class="no-bullets tag-list checking{% if section.settings.tags_combine %} tag-list--checkboxes{% endif %}">
+                  {%- assign tags_to_loop = collection.all_tags -%}
+                  {%- if collection.handle == 'all' and current_tags == blank -%}
+                    {%- assign tags_to_loop = collection.all_tags -%}
+                  {%- endif -%}
+
+                  {%- for tag in tags_to_display -%}
+                    {%- render 'filter-out-custom-tags' -%}
+                    {%- assign tag_name = tag | strip -%}
+                    {%- assign tag_text = tag_name -%}
+                    {%- assign show_tag = false -%}
+
+
+                    {%- if section.settings.tags_combine == true and tags_to_loop contains tag_name -%}
+                      {%- assign show_tag = true -%}
+                    {% elsif section.settings.tags_combine == false and collection.all_tags contains tag_name %}
+                      {%- assign show_tag = true -%}
+                    {%- endif -%}
+{%- if show_tag -%} 
+                    <!--                       custom filter -->
+                    {%- assign tag_count = tag_count | plus: 1 -%}
+                          {% assign tag_hand = tag_text | handle %}
+            
+                          {%- if section.settings.tags_combine -%}
+                          {% assign tag_hand = tag_text | handle %}
+                          <div class="filt_remov_hold">   
+                            <li tag="{{ tag_text | handle }}" class="tag {{ current_tags.size }} {%- if current_tags contains tag_name-%}tag--active {% endif %}">   
+                              {{ tag_text | link_to_tag: tag_name | replace: 'title=', 'class="js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}  
+                               
+                            </li> 
+                            {%- if current_tags contains tag_name-%}
+                              <span class="remove_filt">
+                              {{ 'X' | link_to_remove_tag: tag_name | replace: 'title=', 'class="remove_lnk js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                              </span>
+                            {% endif %}  
+                          </div>                                                      
+                        {%- else -%}
+                          <li class="tag inactive--tag">
+                            {{ tag_text | link_to_tag: tag_name | replace: 'title=', 'class="js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                          </li>
+                        {%- endif -%}  
+ 
+                    {%- endif -%}
+                  {%- endfor -%}
+                </ul>
+          
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- if block.type == 'color_group' -%} 
+      {%- assign swatch_file_extension = 'jpg' -%}
+      {%- assign split_tag_list = block.settings.tag_list | newline_to_br | split:'<br />' -%}
+      {%- assign tags_to_display = split_tag_list -%}
+
+      {% comment %}
+        Output a list of all color tags
+      {% endcomment %}
+      {%- if tags_to_display -%}
+        <div class="collection-sidebar__group">
+          {%- render 'collection-sidebar-filter-trigger', title: block.settings.title, index: forloop.index -%}
+          <div
+            id="{{ location }}-{{ forloop.index }}"
+            class="collapsible-content collapsible-content--sidebar{% unless collapsed_state %} is-open{% endunless %}"
+            {% unless collapsed_state %}style="height: auto;"{% endunless %}>
+            <div class="collapsible-content__inner">
+              {% comment %}
+                Tag and checkbox markup
+              {% endcomment %}
+              {%- assign tag_count = 0 -%}
+              <ul class="no-bullets tag-list{% if settings.product_color_swatches %} tag-list--swatches{% endif %}">
+
+                {%- assign tags_to_loop = collection.tags -%}
+                {%- if collection.handle == 'all' and current_tags == blank -%}
+                  {%- assign tags_to_loop = collection.all_tags -%}
+                {%- endif -%}
+
+                {%- for tag in tags_to_display -%}
+                  {%- render 'filter-out-custom-tags' -%}
+                  {%- assign tag_name = tag | strip -%}
+                  {%- assign tag_text = tag_name -%}
+                  {%- assign show_tag = false -%}
+
+                  {%- if section.settings.tags_combine == true and tags_to_loop contains tag_name -%}
+                    {%- assign show_tag = true -%}
+                  {% elsif section.settings.tags_combine == false and collection.all_tags contains tag_name %}
+                    {%- assign show_tag = true -%}
+                  {%- endif -%}
+
+                  {%- if show_tag -%}
+                    {%- assign tag_count = tag_count | plus: 1 -%}
+                    {%- assign color_image = tag_name | handle | append: '.' | append: swatch_file_extension | file_url | prepend: 'https:' | split: '?' | first -%}
+                    {%- assign color_swatch_fallback = tag_name | split: ' ' | last | handle -%}
+
+                    {%- if settings.product_color_swatches -%}
+                      {% capture swatch %}
+                        <span
+                          class="color-swatch color-swatch--filter color-swatch--{{ tag_name | handle }}"
+                          style="background-image: url({{ color_image }}); background-color: {{ color_swatch_fallback }};">
+                          {{ tag_text }}
+                        </span>
+                      {% endcapture %}
+                    {%- else -%}
+                      {%- assign swatch = tag_text -%}
+                    {%- endif -%}
+
+                    {%- if current_tags contains tag_name -%}
+                      <li class="tag tag--active">
+                        {{ swatch | link_to_remove_tag: tag_name | replace: 'title=', 'class="js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                      </li>
+                    {%- else -%}
+                      {%- if section.settings.tags_combine -%}
+                        <li class="tag {%- if current_tags contains tag_name -%}tag--active {% endif %}">
+                          {{ swatch | link_to_add_tag: tag_name | replace: 'title=', 'class="js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                        </li>
+                      {%- else -%}
+                        <li class="tag">
+                          {{ swatch | link_to_tag: tag_name | replace: 'title=', 'class="js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                        </li>
+                      {%- endif -%}
+                    {%- endif -%}
+
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+
+              {%- if tag_count == 0 -%}
+                {% style %}
+                  .collection-sidebar__group--{{ block.id }} { display: none; }
+                {% endstyle %}
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+{%- endfor -%}
+<!--     custom filters tag base end -->
+    </div>                              
+  {%- endif -%}
+  {% comment %}  Drawer and mobile filter {% endcomment %}
+  <div class="collection-topbar medium-hide large-up-hide">
+  <div class="grid-options">
+    <span class="single-grid" data-grid="single-grid"></span>
+    <span class="multiple-grid" data-grid="multiple-grid"></span>
+  </div>
+  <menu-drawer class="mobile-facets__wrapper {% if filter_type == 'horizontal' or filter_type == 'vertical' %} medium-hide large-up-hide{% endif %}" data-breakpoint="mobile">
+    <details class="mobile-facets__disclosure disclosure-has-popup">
+      <summary class="mobile-facets__open-wrapper focus-offset">
+        <span class="mobile-facets__open{% if filter_type == 'drawer' and enable_filtering == false %} medium-hide large-up-hide{% endif %}">
+          {% render 'icon-filter' %}
+          <span class="mobile-facets__open-label button-label medium-hide large-up-hide">
+            Filters
+          </span>
+          <span class="mobile-facets__open-label button-label small-hide">
+            {%- if enable_filtering -%}
+              {{ 'products.facets.filter_button' | t }}
+            {%- endif -%}
+          </span>
+        </span>
+      </summary>
+      <facet-filters-form>
+        <form id="FacetFiltersFormMobile" class="mobile-facets">
+          <div class="mobile-facets__inner gradient">
+            <span tabindex="0" class="mobile-facets__close mobile-facets__close--no-js">{%- render 'icon-close' -%}</span>
+            <div class="custom_filters mobile_filter">
+            <div class="apply-filter">
+            <span class="button"> Apply Filter </span>
+            </div>
+              {%- if current_tags -%}
+              <ul class="no-bullets tag-list tag-list--active-tags">
+                {%- if current_tags -%}
+                  {%- for tag in current_tags -%}
+                    {%- assign tag_text = tag -%}
+                    {%- assign tag_name = tag | strip -%}
+                    {%- if tag_name contains '_' -%}
+                      {%- assign cat = tag | split: '_' | first -%}
+                      {%- assign tag_text = tag | remove_first: cat | remove_first: '_' -%}
+                    {%- endif -%}
+              
+                    <li class="tag tag--remove" data-tag="{{ tag_name | handleize | downcase }}">
+                      {% capture svgclose %}
+                      <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" role="presentation" class="icon icon-close" fill="none" viewBox="0 0 18 17" width="10px">
+                        <path d="M.865 15.978a.5.5 0 00.707.707l7.433-7.431 7.579 7.282a.501.501 0 00.846-.37.5.5 0 00-.153-.351L9.712 8.546l7.417-7.416a.5.5 0 10-.707-.708L8.991 7.853 1.413.573a.5.5 0 10-.693.72l7.563 7.268-7.418 7.417z" fill="currentColor">
+                      </path></svg>
+                      {% endcapture %}
+                      {{ tag_text | append: ' X' | link_to_remove_tag: tag_name | replace: 'title=', 'class="btn btn--small js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                      
+                    </li>
+                  {%- endfor -%}
+                {%- endif -%}
+              </ul>
+              {% endif %}
+      {%- for block in blocks -%}
+  {%- assign collapsed_state = block.settings.collapsed -%}
+
+  <div class="collection-sidebar__group--{{ block.id }}" {{ block.shopify_attributes }}>
+    {%- if block.type == 'tags_group' or 'tags_all' -%}
+      {%- assign tags_to_display = false -%}
+      {% case block.type %}
+        {% when 'tags_group' %}
+          {%- assign split_tag_list = block.settings.tag_list | newline_to_br | split:'<br />' -%}
+          {%- assign tags_to_display = split_tag_list -%}
+        {% when 'tags_all' %}
+          {%- assign tags_to_display = collection.tags -%}
+      {% endcase %}
+
+      {% comment %}
+        Check if we have underscore-defined tag groups
+      {% endcomment %}
+      {%- assign underscore_groups = false -%}
+      {%- if block.type == 'tags_all' -%}
+        {%- assign categories = '' -%}
+        {%- for tag in tags_to_display -%}
+          {%- render 'filter-out-custom-tags' -%}
+          {%- if tag contains '_' -%}
+            {%- assign underscore_groups = true -%}
+            {% capture categories %}{% unless categories == blank %}{{ categories }}|{% endunless %}{{ tag | split: '_' | first }}{% endcapture %}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- assign cat_array = categories | split: '|' | uniq -%}
+      {%- endif -%}
+
+      {% comment %}
+        Output groups of collapsible tag groups
+      {% endcomment %}
+      {%- if underscore_groups -%}
+        {%- for cat_item in cat_array -%}
+          {%- assign cat_handle = cat_item | handleize -%}
+          <div class="collection-sidebar__group collection-sidebar__group--{{ cat_handle }}">
+            <span class="filter_heading">{{ cat_item }}</span>
+            <div
+              id="{{ location }}-{{ forloop.index }}-{{ cat_handle }}"
+              class="collapsible-content collapsible-content--sidebar{% unless collapsed_state %} is-open{% endunless %}"
+              {% unless collapsed_state %}style="height: auto;"{% endunless %}>
+              <div class="collapsible-content__inner">
+                {% comment %}
+                  Tag and checkbox markup
+                {% endcomment %}
+                {%- assign tag_count = 0 -%}
+                <ul class="no-bullets tag-list{% if section.settings.tags_combine %} tag-list--checkboxes{% endif %}">
+                  {%- for tag in tags_to_display -%}
+                    {%- if collection.tags contains tag -%}
+                    {%- render 'filter-out-custom-tags' -%}
+                    {%- assign cat = tag | split: '_' | first -%}
+                    {%- if cat != tag and cat_item == cat -%}
+                      {% comment %}
+                        Strip out tag category prefix
+                      {% endcomment %}
+                      {%- assign tag_name = tag | strip -%}
+                      {%- assign tag_text = tag_name | remove_first: cat_item | remove_first: '_' -%}
+                      {%- assign tag_count = tag_count | plus: 1 -%}
+
+                      {%- if section.settings.tags_combine -%}
+                        {%- if current_tags contains tag_name -%}
+                          <li class="tag tag--active">
+                            <input name="{{ tag_text }}" type="checkbox" value="{{ tag_text }}">
+                            <label for="{{ tag_text }}" class="medium-up-hide"></label>
+                            <span>{{ tag_text }}</span>
+                          </li>
+                        {%- else -%}
+                          <li class="tag">
+                            <input name="{{ tag_text }}" type="checkbox" value="{{ tag_text }}">
+                            <label for="{{ tag_text }}" class="medium-up-hide"></label>
+                            <span>{{ tag_text }}</span>
+                          </li>
+                        {%- endif -%}
+                      {%- else -%}
+                        <li class="tag">
+                        <input type="checkbox" value="{{ tag_text }}">
+                        <label class="medium-up-hide"></label>
+                        <span>tag_text</span>
+                        </li>
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endif -%}
+                  {%- endfor -%}
+                </ul>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        {% comment %}
+          Output a list of all
+        {% endcomment %}
+        {%- if tags_to_display -%}
+          <div class="collection-sidebar__group">
+            <span class="filter_heading">{{ block.settings.title }}</span>
+            <div
+              id="{{ location }}-{{ forloop.index }}"
+              class="collapsible-content collapsible-content--sidebar{% unless collapsed_state %} is-open{% endunless %}"
+              {% unless collapsed_state %}style="height: auto;"{% endunless %}>
+              <div class="collapsible-content__inner">
+                {% comment %}
+                  Tag and checkbox markup
+                {% endcomment %}
+                {%- assign tag_count = 0 -%}
+                <ul class="{{ block.settings.title }} no-bullets tag-list checking{% if section.settings.tags_combine %} tag-list--checkboxes{% endif %}">
+
+                  {%- assign tags_to_loop = collection.tags -%}
+                  {%- if collection.handle == 'all' and current_tags == blank -%}
+                    {%- assign tags_to_loop = collection.all_tags -%}
+                  {%- endif -%}
+
+                  {%- for tag in tags_to_display -%}
+                    {%- render 'filter-out-custom-tags' -%}
+                    {%- assign tag_name = tag | strip -%}
+                    {%- assign tag_text = tag_name -%}
+                    {%- assign show_tag = false -%}
+
+                    {%- if section.settings.tags_combine == true and tags_to_loop contains tag_name -%}
+                    {%- assign show_tag = true -%}
+                    {% elsif section.settings.tags_combine == false and collection.all_tags contains tag_name %}
+                    {%- assign show_tag = true -%}
+                    {%- endif -%}
+
+{%- if show_tag -%}
+                    <!--                       custom filter mobile -->
+                    {%- assign tag_count = tag_count | plus: 1 -%}
+                      {%- if section.settings.tags_combine -%}
+                          {% assign tag_hand = tag_text | handle %}
+                          {% unless tag_hand == 'view-all' %}
+                          <li tag="{{ tag_text | handle }}" class="tag checking--- {{ current_tags.size }} {%- if current_tags contains tag_name -%}tag--active{% endif %}">
+                            <input id="{{ tag_text }}" name="{{ tag_text }}" type="checkbox" value="{{ tag_text }}">
+                            <label for="{{ tag_text }}" class="medium-up-hide">{{ tag_text }}</label>
+                            <span>{{ tag_text }}</span>
+                          </li>
+                          {% endunless %}  
+                        {%- else -%}
+                          <li class="tag inactive--tag">
+                            <input id="{{ tag_text }}" type="checkbox" value="{{ tag_text }}">
+                            <label for="{{ tag_text }}" class="medium-up-hide"></label>
+                            <span>{{ tag_text }}</span>
+                          </li>
+                        {%- endif -%}
+                    
+                      
+                    {%- endif -%}
+                  {%- endfor -%}
+                </ul>
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- if block.type == 'color_group' -%}
+      {%- assign swatch_file_extension = 'jpg' -%}
+      {%- assign split_tag_list = block.settings.tag_list | newline_to_br | split:'<br />' -%}
+      {%- assign tags_to_display = split_tag_list -%}
+
+      {% comment %}
+        Output a list of all color tags
+      {% endcomment %}
+      {%- if tags_to_display -%}
+        <div class="collection-sidebar__group">
+          <span class="filter_heading">{{ block.settings.title }}</span>
+          <div
+            id="{{ location }}-{{ forloop.index }}"
+            class="collapsible-content collapsible-content--sidebar{% unless collapsed_state %} is-open{% endunless %}"
+            {% unless collapsed_state %}style="height: auto;"{% endunless %}>
+            <div class="collapsible-content__inner">
+              {% comment %}
+                Tag and checkbox markup
+              {% endcomment %}
+              {%- assign tag_count = 0 -%}
+              <ul class="{{ block.settings.title }} no-bullets tag-list{% if settings.product_color_swatches %} tag-list--swatches{% endif %}">
+
+                {%- assign tags_to_loop = collection.tags -%}
+                {%- if collection.handle == 'all' and current_tags == blank -%}
+                  {%- assign tags_to_loop = collection.all_tags -%}
+                {%- endif -%}
+
+                {%- for tag in tags_to_display -%}
+                  {%- render 'filter-out-custom-tags' -%}
+                  {%- assign tag_name = tag | strip -%}
+                  {%- assign tag_text = tag_name -%}
+                  {%- assign show_tag = false -%}
+
+                  {%- if section.settings.tags_combine == true and tags_to_loop contains tag_name -%}
+                    {%- assign show_tag = true -%}
+                  {% elsif section.settings.tags_combine == false and collection.all_tags contains tag_name %}
+                    {%- assign show_tag = true -%}
+                  {%- endif -%}
+
+                  {%- if show_tag -%}
+                    {%- assign tag_count = tag_count | plus: 1 -%}
+                    {%- assign color_image = tag_name | handle | append: '.' | append: swatch_file_extension | file_url | prepend: 'https:' | split: '?' | first -%}
+                    {%- assign color_swatch_fallback = tag_name | split: ' ' | last | handle -%}
+
+                    {%- if settings.product_color_swatches -%}
+                      {% capture swatch %}
+                        <span
+                          class="color-swatch color-swatch--filter color-swatch--{{ tag_name | handle }}"
+                          style="background-image: url({{ color_image }}); background-color: {{ color_swatch_fallback }};">
+                          {{ tag_text }}
+                        </span>
+                      {% endcapture %}
+                    {%- else -%}
+                      {%- assign swatch = tag_text -%}
+                    {%- endif -%}
+
+                    {%- if current_tags contains tag_name -%}
+                      <li class="tag tag--active">
+                        {{ swatch | link_to_remove_tag: tag_name | replace: 'title=', 'class="js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                      </li>
+                    {%- else -%}
+                      {%- if section.settings.tags_combine -%}
+                        <li class="tag {%- if current_tags contains tag_name -%}tag--active {% endif %}">
+                          {{ swatch | link_to_add_tag: tag_name | replace: 'title=', 'class="js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                        </li>
+                      {%- else -%}
+                        <li class="tag">
+                          {{ swatch | link_to_tag: tag_name | replace: 'title=', 'class="js-no-transition" title=' | replace: '?view=ajax', '' | replace: 'view=ajax', '' }}
+                        </li>
+                      {%- endif -%}
+                    {%- endif -%}
+
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+
+              {%- if tag_count == 0 -%}
+                {% style %}
+                  .collection-sidebar__group--{{ block.id }} { display: none; }
+                {% endstyle %}
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+{%- endfor -%}
+<!--     custom filters tag base mobile end -->           
+          </div>
+        </form>
+      </facet-filters-form>
+    </details>
+  </menu-drawer>
+  </div>
+  <div class="active-facets active-facets-mobile small-hide medium-hide large-up-hide">
+    {%- for filter in results.filters -%}
+      {%- for value in filter.active_values -%}
+        <facet-remove>
+          <a href="{{ value.url_to_remove }}" class="active-facets__button active-facets__button--light">
+            <span class="active-facets__button-inner button button--tertiary">
+              {{ filter.label }}: {{ value.label | escape }}
+              {% render 'icon-close-small' %}
+              <span class="visually-hidden">{{ 'products.facets.clear_filter' | t }}</span>
+            </span>
+          </a>
+        </facet-remove>
+      {%- endfor -%}
+
+      {%- if filter.type == "price_range" -%}
+        {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+          <facet-remove>
+            <a href="{{ filter.url_to_remove }}" class="active-facets__button active-facets__button--light">
+              <span class="active-facets__button-inner button button--tertiary">
+                {%- if filter.min_value.value -%}{{ filter.min_value.value | money }}{%- else -%}{{ 0 | money }}{%- endif -%}-{%- if filter.max_value.value -%}{{ filter.max_value.value | money }}{%- else -%}{{ filter.range_max | money }}{%- endif -%}
+                {% render 'icon-close-small' %}
+                <span class="visually-hidden">{{ 'products.facets.clear_filter' | t }}</span>
+              </span>
+            </a>
+          </facet-remove>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+    <facet-remove class="active-facets__button-wrapper">
+      <a href="{{ results_url }}" class="active-facets__button-remove underlined-link">
+        <span>{{ 'products.facets.clear_all' | t }}</span>
+      </a>
+    </facet-remove>
+  </div>
+  {% comment %} Sort, product count and filter pills at the end when filter is type of Drawer for the correct tabbing order {% endcomment %}
+  {%- if enable_sorting and filter_type == 'drawer' -%}
+    <facet-filters-form class="facets small-hide">
+      <form id="FacetSortDrawerForm" class="facets__form">
+        <div class="facet-filters sorting caption small-hide">
+          <div class="facet-filters__field">
+            <h2 class="facet-filters__label caption-large text-body">
+              <label for="SortBy">{{ 'products.facets.sort_by_label' | t }}</label>
+            </h2>
+            <div class="select">
+              {%- assign sort_by = results.sort_by | default: results.default_sort_by -%}
+              <select name="sort_by" class="facet-filters__sort select__select caption-large" id="SortBy" aria-describedby="a11y-refresh-page-message">
+                {%- for option in results.sort_options -%}
+                  <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected="selected"{% endif %}>{{ option.name | escape }}</option>
+                {%- endfor -%}
+              </select>
+              {% render 'icon-caret' %}
+            </div>
+          </div>
+
+          <noscript>
+            <button type="submit" class="facets__button-no-js button button--secondary">{{ 'products.facets.sort_button' | t }}</button>
+          </noscript>
+        </div>
+
+        {% if results.current_vendor or results.current_type %}
+          <input type="hidden" name="q" value="{{ results.current_vendor }}{{ results.current_type }}">
+        {% endif %}
+
+        {%- if results.terms -%}
+          <input type="hidden" name="q" value="{{ results.terms | escape }}">
+          <input name="options[prefix]" type="hidden" value="last">
+        {%- endif -%}
+      </form>
+    </facet-filters-form>
+  {%- endif -%}
+  <div class="product-count light{% if filter_type == 'vertical' or filter_type == 'horizontal' %} small-hide medium-hide large-up-hide{% endif %}" role="status">
+    <h2 class="product-count__text text-body">
+      <span id="ProductCount">
+        {%- if results.results_count -%}
+          {{ 'templates.search.results_with_count' | t: terms: results.terms, count: results.results_count }}
+        {%- elsif results.products_count == results.all_products_count -%}
+          {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
+        {%- else -%}
+          {{ 'products.facets.product_count' | t: product_count: results.products_count, count: results.all_products_count }}
+        {%- endif -%}
+      </span>
+    </h2>
+    <div class="loading-overlay__spinner">
+      <svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+        <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+      </svg>
+    </div>
+  </div>
+  {%- if filter_type == 'drawer' -%}
+    <facet-filters-form class="facets facets-pill small-hide">
+      <form id="FacetFiltersPillsForm" class="facets__form">
+        <div class="active-facets active-facets-desktop">
+          {%- for filter in results.filters -%}
+            {%- for value in filter.active_values -%}
+              <facet-remove>
+                <a href="{{ value.url_to_remove }}" class="active-facets__button active-facets__button--light">
+                  <span class="active-facets__button-inner button button--tertiary">
+                    {{ filter.label }}: {{ value.label | escape }}
+                    {% render 'icon-close-small' %}
+                    <span class="visually-hidden">{{ 'products.facets.clear_filter' | t }}</span>
+                  </span>
+                </a>
+              </facet-remove>
+            {%- endfor -%}
+
+            {%- if filter.type == "price_range" -%}
+              {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                <facet-remove>
+                  <a href="{{ filter.url_to_remove }}" class="active-facets__button active-facets__button--light">
+                    <span class="active-facets__button-inner button button--tertiary">
+                      {%- if filter.min_value.value -%}{{ filter.min_value.value | money }}{%- else -%}{{ 0 | money }}{%- endif -%}-{%- if filter.max_value.value -%}{{ filter.max_value.value | money }}{%- else -%}{{ filter.range_max | money }}{%- endif -%}
+                      {% render 'icon-close-small' %}
+                      <span class="visually-hidden">{{ 'products.facets.clear_filter' | t }}</span>
+                    </span>
+                  </a>
+                </facet-remove>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+          <facet-remove class="active-facets__button-wrapper">
+            <a href="{{ results_url }}" class="active-facets__button-remove underlined-link">
+              <span>{{ 'products.facets.clear_all' | t }}</span>
+            </a>
+          </facet-remove>
+        </div>
+      </form>
+    </facet-filters-form>
+  {%- endif -%}
+</div>

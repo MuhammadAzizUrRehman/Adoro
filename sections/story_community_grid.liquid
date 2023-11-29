@@ -1,0 +1,242 @@
+{% style %}
+  section.story_page_community .page-width{
+    max-width: 900px;
+    margin: 0px auto;
+    }
+  span.partner-logo img,
+  a.beam-logo img{
+    height: 60px;
+}
+  a.beam-logo img{
+    height: 32px;
+}
+  .logo_partner_bar {
+    display: flex;
+    align-items: center;
+}
+  .logo-separator {
+    border-left: 1px solid lightgray;
+    margin-right:  20px;
+    margin-left: 20px;
+    height: 40px;
+    display: inline-block;
+}
+  .beam-nonprofit-image-cards {
+    display: flex;
+        margin-top: 10px;
+        flex-wrap: wrap;
+    column-gap: 15px;
+    row-gap: 15px;
+      
+  }
+
+  .image-card{
+    border: 1px solid #d7d7d7;
+    border-radius: 4px;
+    width: 49%;
+  }
+  .image-card-image-box {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0px 24px 16px;
+    overflow-wrap: break-word;
+    background-color: rgb(85, 85, 85);
+    background-blend-mode: overlay;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+  p.image-card-cause, 
+    .image-card-name{
+    color: white;
+      margin: 0px;
+}
+  p.image-card-cause {
+    font-size: 14px;
+    font-family: sans-serif;
+}
+  .image-card-name{
+    font-size: 22px;   
+  }
+  .image-card-progress {
+    margin-top: 5px;
+}
+  .progress-bar-container {
+/*     border-radius:  10px; */
+    height: 10px;
+    padding: 0px;
+    width: 100%;
+    background: lightgray;
+    position: relative;
+    border: 1px solid #929292;
+    overflow: clip;
+}
+
+  .image-card-progressText {
+    font-size: 12px;
+    color: #4B5360;
+    font-family: sans-serif;
+}
+.image-card-description,
+  .image-card-footer{
+  margin-top: 10px;
+    font-family: sans-serif;
+        font-size: 14px;
+}
+  .image-card-link {
+    font-size: 12px;
+    color: #565658;
+  }
+
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+    .signature__item img {
+    max-height: 100px;
+}
+  }
+{% endstyle %}  
+<section class="story_page_community section-{{ section.id }}-padding">
+<div class="page-width">  
+  <div class="logo_partner_bar">
+    <span class="partner-logo">
+      <img part="partner-logo" src="{{ section.settings.logo_1 | img_url: 'master' }}" alt="Beckett Simonon Logo">
+    </span>
+    <span class="logo-separator" part="logo-separator"></span>
+    <a class="beam-logo" href="https://beamimpact.com" rel="external">
+      <img part="beam-logo" alt="Beam Impact Logo" src="{{ section.settings.logo_2 | img_url: 'master' }}">
+    </a>
+  </div>  
+
+  <div part="nonprofit-cards" class="beam-nonprofit-image-cards">
+    {% for block in section.blocks %}
+      <div class="image-card" part="nonprofit-card" style="display: flex; flex-direction: column;">
+        <div class="image-card-image-box" style="background-image: url({{ block.settings.image | img_url: 'master' }});">
+          <p class="image-card-cause">{{ block.settings.subtitle }}</p>
+          <h4 class="image-card-name">{{ block.settings.title }}</h4>
+        </div>
+        <div style="padding: 5px 15px 15px; flex: 1 1 auto; border-radius: 0px; border: none; display: flex; flex-direction: column;">
+          <div class="image-card-progress" style="display: flex; align-items: center;">
+            <beam-progress-bar style="flex-grow: 1;" value="55">
+              <div class="progress-bar-container">
+                <div class="progress-bar" style="width: 55%;"></div>
+              </div>
+            </beam-progress-bar>
+            <span class="image-card-progressText" style="margin-left: 20px;">55% funded</span>
+          </div>
+          <div class="image-card-description">
+            {{ block.settings.description }}
+          </div>
+          <div style="display: flex; align-items: end; flex-wrap: wrap; gap: 10px; flex: 1;" class="image-card-footer">
+            <div class="image-card-goal-completion" style="flex-grow: 1;">
+              <!--?lit$283259245$--><!--?-->
+            </div>
+            <a target="_blank" class="image-card-link" style="white-space: nowrap" href="{{ block.settings.btn_url }}">
+              <!--?lit$283259245$-->{{ block.settings.btn_txt }}<span class="image-card-link-arrow">&nbsp;›</span>
+            </a>
+          </div>
+        </div>
+      </div>
+     {% endfor %}
+    </div>
+    
+</div>  
+</section>
+{% schema %}
+  {
+    "name": "Story community",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo_1",
+        "label": "logo 1"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo_2",
+        "label": "logo 2"
+      },
+      {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+    ],
+    "blocks": [
+      {
+        "type": "grid_block",
+        "name": "grid_block",
+        "settings":[
+           {
+             "type": "image_picker",
+             "id": "image",
+             "label": "image"
+           },
+           {
+             "type": "text",
+             "id": "subtitle",
+             "label": "subtitle",
+             "default": "Mental Health"
+           },
+           {
+             "type": "text",
+             "id": "title",
+             "label": "title",
+             "default": "Race Forward"
+           },
+           {
+             "type": "textarea",
+             "id": "description",
+             "label": "description",
+             "default": "Fund a one week training on Organizing Racial Equity: Shifting Power for 140 aspiring community organizers"
+           },
+           {
+             "type": "text",
+             "id": "btn_txt",
+             "label": "buton text",
+             "default": "Learn More"
+           },
+           {
+             "type": "url",
+             "id": "btn_url",
+             "label": "buton url"
+           }          
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "story community"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

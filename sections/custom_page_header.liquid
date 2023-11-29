@@ -1,0 +1,89 @@
+{% render 'custom_page_css' %}
+{% style %}
+  seciton.custom_page_header .holder{
+    position: relative;
+    background-size: cover;
+  }
+  seciton.custom_page_header .content {
+        position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    bottom: 0;
+    width: 100%;
+    height: auto;
+}
+  seciton.custom_page_header .holder {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url({{ section.settings.image | img_url: 'master' }});
+} 
+      .custom_page_header .holder{
+/*       padding-bottom: { { 1 | divided_by: section.settings.image.aspect_ratio | times: 100  }}%; */
+       height: 100vh;
+      }
+{% endstyle %}  
+<seciton class="custom_page_header">
+  <div class="holder">
+    <div class="content">
+      <div class="text_video">
+      <div class="image-with-text__text-item">
+        <div id="ImageWithText--{{ section.id }}" class="image-with-text__content image-with-text__content--{{ section.settings.desktop_content_position }} image-with-text__content--desktop-{{ section.settings.desktop_content_alignment }} image-with-text__content--mobile-{{ section.settings.mobile_content_alignment }} image-with-text__content--{{ section.settings.height }} gradient color-{{ section.settings.color_scheme }} content-container">
+          <h2 class="image-with-text__heading">
+            {{ section.settings.heading | escape }}
+          </h2>    
+          <a href="#{{ section.settings.id }}" aria-label="Scroll Down" class="header-main__scroll animation-parent js-scroll-to">
+            <span class="visually-hidden">Scroll down</span>
+            <span class="icon icon--arrow rotate-90 animation--go-to"></span>
+          </a>
+          
+        </div>
+      </div>  
+    </div>
+    </div>  
+    <ul class="information-nav js-information-nav">  
+    {% for link in section.settings.menu.links %}  
+    <li class="information-nav__item">
+      <a class="information-nav__item-link {% if link.active %} is-active {% endif %}" href="{{ link.url }}">{{ link.title }}</a>
+    </li>
+    {% endfor %}        
+    </ul>
+  </div>
+</seciton>  
+{% schema %}
+  {
+    "name": "Custom page header",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "select image"
+      },
+        {
+        "type": "text",
+        "label": "image heading",
+        "id":"heading"
+      },
+      {
+        "type": "link_list",
+        "id": "menu",
+        "label": "select menu"
+      },
+      {
+        "id": "id",
+        "type": "text",
+        "label": "arrow id"
+      }
+      
+    ],
+    "presets": [
+      {
+        "name": "custom page header"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

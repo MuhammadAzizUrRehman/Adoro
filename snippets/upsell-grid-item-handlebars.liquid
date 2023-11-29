@@ -1,0 +1,107 @@
+<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+<script id="upsell-product-grid" type="text/x-handlebars-template">
+   {% raw %}
+   <div class="upsell_product_item product_card" data-id="{{id}}">
+     <div class="upsell_product_item-content">
+       <span class="upsell_product_item-content--wrapper">
+         <span>
+           <h2 class="upsell_product_item_title"></h2><p class="upsell_product_item_detail">
+                 <span class="">{{title}}</span>
+           </p>
+         </span>
+
+         <div class="upsell_product_item_img Oak">
+           <img style="width:100%;" src="{{ featured_image }}" alt="" class="upsell_product_item_thumb bm_upsell_product_item_thumb">
+         </div>
+       </span>
+       <div class="product-price-liveshop">
+         <span class="price-after"> {{price_new}} </span>
+         {{#if price_varies_new}}
+         <span class="price-before upsell_product_item_price_before"> {{compare_at_price_new}} </span>
+         {{/if}}
+       </div>
+
+       <div class="upsell_product_item_info">
+         <div class="bottom-wrapper">
+           <div class="ajaxCart">
+             <div class="flex_wrap">
+
+               <div class="option_select_box {{id}}">
+                 {{#ifCond variants.length '>' 1}}
+                 {{#each options}}
+                   <div class="radio-wrapper js product-form__item">
+                     <div class="upsell_product_item_select_wrapper select-wrapper">
+                       <select class="single-option-selector single-option-selector-{{@index}} product-form__input upsell_product_item_select select" id="SingleOptionSelector-{{@index}}" data-index="option{{@index}}">
+                         {{#each this.values}}
+                         <option value="{{this}}" {{#ifCond @index '==' 0}} selected="selected" {{/ifCond}}>
+                           {{this}}
+                         </option>
+                         {{/each}}
+                       </select>
+                     </div>
+                   </div>
+                   {{/each}}
+                   {{/ifCond}}
+
+                   <select name="id" data-productid="{{ this.id }}" id="productSelect-{{ this.id }}" data-product-select="" style="display:none">
+                     {{#each variants}}
+                        <option data-variant-value="{{ this.title }}" data-sku="{{ this.sku }}" value="{{ this.id }}" {{ @index }} {{#ifCond @index '==' 0}}class="selected" selected="selected" {{/ifCond}}>
+                           {{ this.title }} - {{ this.price }}
+                        </option>
+                        {{/each}}
+                     </select>
+                     <form method="post" action="/cart/add" id="product-form-template--17249192116512__main" accept-charset="UTF-8" class="form js-upsell-product-form" style="display:none" enctype="multipart/form-data" novalidate="novalidate" data-type="add-to-cart-form">
+                      <input type="hidden"  name="form_type" value="product">
+                      <input type="hidden" name="utf8" value="✓">
+                      <input id="js-upsell-variant-id" type="hidden" name="id" value="{{variant_id}}">
+                       <div class="product-form__buttons">
+                         <button type="submit" name="add" class="product-form__submit button button--full-width button--secondary" aria-haspopup="dialog">
+                           <span>Add to cart
+                     </span>
+                           <div class="loading-overlay__spinner hidden">
+                             <svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                               <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                             </svg>
+                           </div>
+                     </div>
+                   </form>
+                 <button class="btn btn--scarlet add_to_cart_btn product_add_to_cart button js-upsell-atc" type="button">
+                   Add to My Order
+                 </button>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+  {% endraw %}
+</script>
+<script>
+  Handlebars.registerHelper("ifCond", function (v1, operator, v2, options) {
+    switch (operator) {
+      case "==":
+        return v1 == v2 ? options.fn(this) : options.inverse(this);
+      case "===":
+        return v1 === v2 ? options.fn(this) : options.inverse(this);
+      case "!=":
+        return v1 != v2 ? options.fn(this) : options.inverse(this);
+      case "!==":
+        return v1 !== v2 ? options.fn(this) : options.inverse(this);
+      case "<":
+        return v1 < v2 ? options.fn(this) : options.inverse(this);
+      case "<=":
+        return v1 <= v2 ? options.fn(this) : options.inverse(this);
+      case ">":
+        return v1 > v2 ? options.fn(this) : options.inverse(this);
+      case ">=":
+        return v1 >= v2 ? options.fn(this) : options.inverse(this);
+      case "&&":
+        return v1 && v2 ? options.fn(this) : options.inverse(this);
+      case "||":
+        return v1 || v2 ? options.fn(this) : options.inverse(this);
+      default:
+        return options.inverse(this);
+    }
+  });
+</script>

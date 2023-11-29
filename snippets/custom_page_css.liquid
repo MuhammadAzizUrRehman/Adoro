@@ -1,0 +1,186 @@
+{% style %}
+  seciton.custom_page_header .holder{
+    background-position: 50%;
+  }
+/*   image with text */
+  .custom_page .image-with-text:not(.make_wide) .grid,
+  .craftsmanship .image-with-text:not(.make_wide) .grid{
+        max-width: 75%;
+  }
+/*   custom page model section bar */
+  aside.modal.product-modal.section {
+    background: none;
+    display: block !important;
+    position: relative;
+    top: 0;
+    left: 0;
+    max-height: 100%;
+}
+  aside.modal.product-modal.section .savings__wrapper{
+    max-width: 100%;
+  }
+  aside.modal.product-modal.section .modal__header{
+    padding-bottom: 0px;
+  }
+  aside.modal.product-modal.section .savings__title {
+    font-size: 3rem;
+  }
+    aside.modal.product-modal.section .modal__container {
+        height: 100%;
+      max-width: 100%;
+          padding: 80px 47px 80px;
+}
+  aside.modal.product-modal.section .modal__content{
+    position: relative;
+  }
+/*   end */
+  .custom_page .multicolumn-list p{
+    font-size: 1.6rem;
+    font-family: georgia,serif;
+        line-height: 3rem;
+  }
+  .custom_page .multicolumn-list__item .media--adapt .multicolumn-card__image{
+        height: 40px;
+            top: 50%;
+  }
+/*   wanted richtext */
+  .waanted.rich-text__text.rte p {
+    font-size: 2.6rem;
+}
+  .custom_page .wanted_rich-text .page-width {
+    padding: 54px 0 73px 100px;
+}
+/* end */
+  .custom_page .image-with-textmake_wide.grid .grid{
+    align-items: flex-start;
+  }
+  .custom_page .make_wide .image-with-text__grid {
+    justify-content: space-evenly;
+}
+  .custom_page .make_wide .image-with-text .grid__item {
+    width: calc(50% - 190px);
+    max-width: calc(50% - 50px);
+}
+  .custom_page_rich_txt_dble .rich-text__wrapper {
+    max-width: 100%;
+    margin: 0 auto;
+    max-width: 1160px;
+    justify-content: space-between;
+}
+
+  .custom_page .top_head,
+  .craftsmanship .top_head,
+  .our_story .top_head{
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9;
+}
+    .custom_page .header-main__scroll,
+  .craftsmanship .header-main__scroll{
+    bottom: 0px;
+  }
+  .custom_page_header .image-with-text__content{
+    align-items: center;
+    text-align: center;
+    position: inherit;
+    background: transparent;
+  }
+  .custom_page_header .header_content .image-with-text__content {
+    background: transparent;
+}
+  .custom_page_header h2.image-with-text__heading {
+    font-size: 3.5rem;
+    color: #fff;
+    margin: 0px auto;
+    margin-bottom: 60px;
+    max-width: 580px;
+}
+  .information-nav {
+    background: hsla(0,0%,100%,.75);
+    bottom: 0px;
+    padding: 0 10px;
+    position: absolute;
+    text-align: center;
+    transition: background .2s ease;
+    width: 100%;
+    margin: 0px;
+}
+  .information-nav__item {
+    display: inline-block;
+}
+  .information-nav__item-link{
+    border-bottom: 2px solid transparent;
+  }
+  .information-nav__item:first-of-type .information-nav__item-link {
+    margin-left: 0;
+}
+  .information-nav__item-link.is-active, .information-nav__item-link:hover {
+    border-color: #565658;
+}
+  a.information-nav__item-link {
+    font-family: nunito-sans--bold,Arial,sans-serif;
+    color: inherit;
+    text-decoration: none;
+        padding: 18px 2px;
+    display: block;
+    text-transform: uppercase;
+}
+  @media(max-width: 767px){
+    .custom_page .custom_page_header .image-with-text__content{
+      padding-left: 4rem;
+      padding-right: 4rem;
+    }
+    .custom_page_rich_txt_dble .rich-text__wrapper{
+      flex-wrap: wrap;
+    }
+      a.information-nav__item-link{
+        font-size: 1.2rem;
+  }
+  .information-nav__item {
+    margin: 0px 10px;
+}
+
+    .custom_page .custom_page_rich_txt_dble .rich-text__blocks {
+    background: transparent !important;
+    width: 100%;
+    max-width: 100% !important;  
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+    .custom_page_rich_txt_dble .rich-text__text.rte {
+    font-size: 1.6rem;
+}
+    .custom_page .rich-text__wrapper h2.rich-text__heading{
+      margin-bottom: 35px;
+    }
+    .custom_page .custom_page_rich_txt_dble .rich-text__blocks {
+    padding: 39px 70px 39px;
+}
+    aside.modal.product-modal.section .modal__content {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+    aside.modal.product-modal.section .product-modal .savings__description {
+    font-size: 1.7rem;
+          margin-bottom: 20px;
+}
+    .savings__prices .savings__price:nth-of-type(2) .savings-price__box{
+      display: block;
+    }
+    .page--template .custom_prod_slider .txt_holder{
+      text-align: start;
+    }
+  }
+  @media (min-width: 64.0625rem){
+    .information-nav__item-link {
+    font-size: 1.3rem;
+    margin: 0 23px;
+}
+.information-nav {
+    padding: 0 25px;
+}
+
+  }
+{% endstyle %}

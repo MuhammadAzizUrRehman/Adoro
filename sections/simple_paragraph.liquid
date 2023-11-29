@@ -1,0 +1,120 @@
+{%- style -%}
+  seciton.simple_paragraph h2 {
+        max-width: 722px;
+    margin: 0px auto;
+    margin-bottom: 60px;
+    text-align: center;
+    font-family: georgia,serif;
+    font-weight: 100;
+    font-size: 2.4rem;
+    line-height: inherit;
+    margin-bottom: 0px;
+}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+<seciton class="simple_paragraph gradient">
+  <div class="page-width section-{{ section.id }}-padding isolate color-{{ section.settings.color_scheme }} background-{{ section.settings.background_style }}">
+  <h2>{{ section.settings.text }}</h2>
+  </div>  
+</seciton>  
+{% schema %}
+  {
+    "name": "Simple Paragraph",
+    "settings": [
+      {
+        "type": "textarea",
+        "id": "text",
+        "label": "paragraph"
+      },
+      {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        {
+          "value": "accent-1",
+          "label": "t:sections.all.colors.accent_1.label"
+        },
+        {
+          "value": "accent-2",
+          "label": "t:sections.all.colors.accent_2.label"
+        },
+        {
+          "value": "background-1",
+          "label": "t:sections.all.colors.background_1.label"
+        },
+        {
+          "value": "background-2",
+          "label": "t:sections.all.colors.background_2.label"
+        },
+        {
+          "value": "inverse",
+          "label": "t:sections.all.colors.inverse.label"
+        }
+      ],
+      "default": "background-1",
+      "label": "t:sections.all.colors.label"
+    },
+    {
+      "type": "select",
+      "id": "background_style",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:sections.multicolumn.settings.background_style.options__1.label"
+        },
+        {
+          "value": "primary",
+          "label": "t:sections.multicolumn.settings.background_style.options__2.label"
+        }
+      ],
+      "default": "primary",
+      "label": "t:sections.multicolumn.settings.background_style.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+    ],
+    "presets": [
+      {
+        "name": "simple paragraph"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

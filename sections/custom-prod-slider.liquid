@@ -1,0 +1,141 @@
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+  .img_holder img {
+    width: 100%;
+}
+  section.custom_prod_slider .width_holder {
+    max-width: 960px;
+    margin: 0px auto;
+}
+  .custom_prod_slider .txt_holder {
+    max-width: 400px;
+}
+  .product-media__carousel-actions {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+  .product-media__carousel-arrows .icon {
+    color: #930303;
+}
+  p.product-media__carousel-counter.js-slick-product-media-counter {
+    font-family: nunito-sans,Arial,sans-serif;
+    margin: 0px;
+    display: block;
+}
+.product-media__carousel-arrows button{  
+    background: transparent;
+    border: 0px;
+    cursor: pointer;
+}
+  .product--template section.custom_prod_slider .compress_width {
+    align-items: start;
+}
+  {% endstyle %}
+<section class="custom_prod_slider section-{{ section.id }}-padding">
+  <div class="width_holder page-width">
+  <div class="grid compress_width grid--2-col-tablet grid--1-col-tablet-down">
+    <div class="grid__item text">
+      <div class="txt_holder">
+      <h1>{{ section.settings.main_heading }}</h1>
+      <span class="subtitle_line layout-section__eyebrow">{{ section.settings.subtitle_line }}</span>  
+      <p>{{ section.settings.paragraph }}</p>
+      </div>  
+    </div>
+    <div class="grid__item image">
+      <div class="img_holder js-slick-product-media">
+      {% for block in section.blocks %}
+        <img src="{{ block.settings.image | img_url: 'master' }}">
+      {% endfor %}  
+      </div>  
+      <div class="product-media__carousel-actions">
+        <p class="product-media__carousel-counter js-slick-product-media-counter"></p>
+        <div class="product-media__carousel-arrows">
+          <button aria-label="Prev Product" class="animation-parent js-slick-product-media__prev">
+            <span class="animation--go-to rotate-180 icon icon--arrow"></span></button>
+          <button aria-label="Next Product" class="animation-parent js-slick-product-media__next">
+            <span class="animation--go-to icon icon--arrow"></span></button>
+        </div>
+      </div>
+    </div>
+  </div>  
+  </div>  
+</section>  
+{% schema %}
+  {
+    "name": "custom prod slider",
+    "settings": [
+      {
+        "type": "text",
+        "id":"main_heading",
+        "label": "heading"
+      },
+      {
+        "type": "text",
+        "id": "subtitle_line",
+        "label": "subtitle line"
+      },
+      {
+        "type": "richtext",
+        "id": "paragraph",
+        "label": "paragraph"
+      },      
+      {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "t:sections.all.padding.padding_bottom",
+        "default": 36
+      }
+    ],
+    "blocks": [
+      {
+        "name": "image",
+        "type": "image",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "image"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+      "name": "custom prod slider"
+        }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

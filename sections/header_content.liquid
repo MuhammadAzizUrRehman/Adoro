@@ -1,0 +1,103 @@
+{% if section.settings.show_hide %}
+{% style %}
+  {% comment %}   text {% endcomment %}
+    section.header_content {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+ .header_content .image-with-text__content {
+    background: transparent;
+}
+   div#shopify-section-header_content {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    bottom: 0;
+        height: 100%; 
+     width: 100%;
+}
+  .header_content .image-with-text__content {
+    align-items: center;
+    text-align: center;
+        position: inherit;
+  }
+  .header_content h2.image-with-text__heading {
+    font-size: 3.5rem;
+    color: #fff;
+    margin-bottom: 60px;    
+    max-width: 540px;
+
+}
+  .header_content a.button {
+    color: #000;
+    background-color: #fff;
+    cursor: pointer;
+}
+  .header_content a.button:focus, .header_content a.button:hover {
+    background-color: #d9d9d9 !important;
+}
+{% endstyle %}  
+<section class="header_content">
+  <!-- header content                     -->
+  <div class="text_video">
+    <div class="image-with-text__text-item">
+      <div id="ImageWithText--{{ section.id }}" class="image-with-text__content image-with-text__content--{{ section.settings.desktop_content_position }} image-with-text__content--desktop-{{ section.settings.desktop_content_alignment }} image-with-text__content--mobile-{{ section.settings.mobile_content_alignment }} image-with-text__content--{{ section.settings.height }} gradient color-{{ section.settings.color_scheme }} content-container">
+        <h2 class="image-with-text__heading {{ section.settings.heading_size }}" {{ section.shopify_attributes }}>
+          {{ section.settings.heading | escape }}
+        </h2>
+        {%- if section.settings.button_label != blank -%}
+          <a{% if section.settings.button_link == blank %} role="link" aria-disabled="true"{% else %} href="{{ section.settings.button_link }}"{% endif %} class="button{% if section.settings.button_style_secondary %} button--secondary{% else %} button--primary{% endif %}" {{ section.shopify_attributes }}>
+            {{ section.settings.button_label | escape }}
+          </a>
+        {%- endif -%}     
+        <a href="#MainContent" aria-label="Scroll Down" class="header-main__scroll animation-parent js-scroll-to">
+          <span class="visually-hidden">Scroll down</span>
+          <span class="icon icon--arrow rotate-90 animation--go-to"></span>
+        </a>
+      </div>
+    </div>  
+  </div>
+</section>  
+{% endif %}
+{% schema %}
+  {
+    "name": "Header content",
+    "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_hide",
+      "label": "Show/Hide",
+      "default": false
+    },
+    {
+        "type": "text",
+        "label": "video heading",
+        "id":"heading"
+      },
+      {
+        "type": "text",
+        "id": "button_label",
+        "default": "Button label",
+        "label": "button text"
+      },
+      {
+        "type": "url",
+        "id": "button_link",
+        "label": "button link"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Header content"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

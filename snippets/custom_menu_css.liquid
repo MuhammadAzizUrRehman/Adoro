@@ -1,0 +1,99 @@
+{% style %}
+
+  .mega-menu-custom {
+    background-color: #fff;
+    bottom: 0;
+    left: calc((((100vw - 1280px) / 2) + 410px) * -1);
+    opacity: 0;
+    padding-top: 94px;
+    position: fixed;
+    top: 36px;
+    transition: opacity .3s ease,left .5s ease;
+    width: 25%;
+    z-index: 5;
+    visibility: hidden;
+    padding-left: 2%;
+}
+    .js-mega-menu-product.is-active {
+    border-color: black;
+}
+  .mega-menu-custom a{
+    color: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    text-transform: capitalize;
+  }
+  .mega-menu--open .mega-menu-custom {
+    left: 0;
+    opacity: 1;
+    visibility: visible;
+    
+}
+.mega-menu__wrapper {
+    height: 100%;
+    overflow-y: auto;
+/*     padding: 0 40px 20vh 25px; */
+}
+  .mega-menu__fade {
+    background: linear-gradient(180deg,hsla(0,0%,100%,0) 0,hsla(0,0%,100%,.35) 20%,#fff 57%);
+    bottom: 0;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#f6290c",endColorstr="#ffffff",GradientType=0);
+    height: 15vh;
+    position: fixed;
+    width: 25%;
+}
+  .icon--close:before {
+    content: "";
+}
+  .mega-menu__item {
+    padding-bottom: 3vh;
+}
+  .mega-menu__close {
+    cursor: pointer;
+    position: absolute;
+    right: 70px;
+    transition: transform .3s ease;
+}
+/*   all collection link */
+  .mega-menu__item-title {
+        display: inline-block;
+    font: 1.5rem/1.5625rem nunito-sans--bold,Arial,sans-serif;
+    font-weight: 700;
+}
+  .mega-menu__item-title .icon {
+    margin-left: 16px;
+}
+/*   heading menu */
+  .mega-menu__item-type {
+    font: 1.7rem/1.875rem nunito-sans--bold,Arial,sans-serif;
+    padding-bottom: 12px;
+    text-transform: capitalize;
+}
+  h2.mega-menu__item-type a {
+    font-weight: 600;
+}
+  .mega-menu__item-products {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+  .mega-menu__item-link {
+    border-bottom: 1px solid transparent;
+    display: inline-block;
+    font: 1.5rem/1.5625rem nunito-sans,Arial,sans-serif;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+  .mega-menu__close:hover {
+    transform: rotate(-90deg);
+}
+  .mega-menu__fade:empty {
+    display: block;
+}
+/*   media query */
+  @media (min-width: 83.125rem){
+.mega-menu__wrapper {
+    padding-left: 3rem;
+}
+    }
+{% endstyle %}

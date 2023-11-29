@@ -1,0 +1,4 @@
+<button type="button" class="js-product-filter collection-sidebar-filter-trigger collapsible-trigger collapsible-trigger-btn collapsible--auto-height{% unless collapsed_state %} is-open{% endunless %} tag-list__header" aria-controls="{{ location }}-{{ index }}{% if id %}-{{ id }}{% endif %}">
+  <span class="txt">{{ title }}</span>
+  {% render 'collapsible-icons' %}
+</button>

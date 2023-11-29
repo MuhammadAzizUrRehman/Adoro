@@ -1,0 +1,184 @@
+{%- liquid
+  assign id = object.id
+  assign image = object.settings.image
+  assign link = object.settings.link
+  assign video = object.settings.video
+
+  assign preheading = object.settings.preheading
+  assign heading = object.settings.heading
+  assign subheading = object.settings.subheading
+
+  assign preheading_color = object.settings.preheading_color
+  assign heading_color = object.settings.heading_color
+  assign subheading_color = object.settings.subheading_color
+
+  assign text_alignment = object.settings.text_alignment
+  assign text_horizontal_position = object.settings.text_horizontal_position
+  assign text_vertical_position = object.settings.text_vertical_position
+
+  assign background_color = object.settings.background_color
+  assign text_width = object.settings.text_width
+
+  assign button_1 = object.settings.button_1
+  assign button_1_link = object.settings.button_1_link
+  assign button_1_style = object.settings.button_1_style
+  assign button_2 = object.settings.button_2
+  assign button_2_link = object.settings.button_2_link
+  assign button_2_style = object.settings.button_2_style
+
+  assign mobile_image = object.settings.mobile_image
+-%}
+
+{%- liquid
+  if button_1 != blank or button_2 != blank
+    assign buttons = true
+  else
+    assign buttons = false
+  endif
+
+  if background_color != null
+    assign allow_padding = true
+  else
+    assign allow_padding = false
+  endif
+-%}
+
+<div
+  {% if type == 'block' %}
+    {{ block.shopify_attributes }}
+  {% endif %}
+  class="splide__slide {{ context }}__banner columns one-whole {{ context }}__banner--{{ id }}"
+>
+  {% comment %}
+    <button class="custom-mute-button">
+      <span class="icon-mute">
+        {% render 'icon-mute' %}
+      </span>
+      <span class="icon-unmute">
+        {% render 'icon-unmute' %}
+      </span>
+    </button>
+  {% endcomment %}
+  {% style -%}
+    .{{ context }}__banner--{{ id }} .caption-content {
+      background:  {{ background_color }} ;
+      border: {{ border_width }}px solid {{ border_color }};
+    }
+
+    .{{ context }}__banner--{{ id }} .{{ context }}__heading {
+      color: {{ heading_color }};
+    }
+
+    .{{ context }}__banner--{{ id }} .{{ context }}__preheading {
+      color: {{ preheading_color }};
+    }
+
+    .{{ context }}__banner--{{ id }} .{{ context }}__subheading {
+      color: {{ subheading_color }};
+    }
+
+    @media only screen and (min-width: 480px) {
+      .{{ context }}__banner--{{ id }} .caption-content {
+        width: {{ text_width }}%;
+      }
+    }
+  {% endstyle -%}
+  <a href="{{ link }}" class="banner--full-link">
+    {% if video != blank %}
+      <div class="Video__custom-main--wrap">
+        <div class="Video__custom-main">
+          <video class="custom__video custom-muted-video" muted="true" autoplay loop="true">
+            <source src="{{ video.sources[1].url }}" type="video/mp4">
+            <source src="{{ video.sources[1].url }}" type="video/ogg">
+          </video>
+        </div>
+      </div>
+    {% else %}
+      <div class="slideshow__media-banner is-mobile-hidden">
+        {%- if image -%}
+          {%- liquid
+            assign height = image.width | divided_by: image.aspect_ratio | round
+            if image_behavior == 'ambient'
+              assign sizes = '120vw'
+              assign widths = '450, 660, 900, 1320, 1800, 2136, 2400, 3600, 7680'
+            else
+              assign sizes = '100vw'
+              assign widths = '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+            endif
+          -%}
+          {{
+            image
+            | image_url: width: 3840
+            | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths
+          }}
+        {%- else -%}
+          {%- assign placeholder_slide = forloop.index | modulo: 2 -%}
+          {%- if placeholder_slide == 1 -%}
+            {{ 'hero-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- else -%}
+            {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+
+      <div class="slideshow__media-banner is-desktop-hidden">
+        {%- if mobile_image -%}
+          {%- liquid
+            assign height = mobile_image.width | divided_by: mobile_image.aspect_ratio | round
+            if image_behavior == 'ambient'
+              assign sizes = '120vw'
+              assign widths = '450, 660, 900, 1320, 1800, 2136, 2400, 3600, 7680'
+            else
+              assign sizes = '100vw'
+              assign widths = '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+            endif
+          -%}
+          {{
+            mobile_image
+            | image_url: width: 3840
+            | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths
+          }}
+        {%- else -%}
+          {%- assign placeholder_slide = forloop.index | modulo: 2 -%}
+          {%- if placeholder_slide == 1 -%}
+            {{ 'hero-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- else -%}
+            {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    {% endif %}
+  </a>
+
+  {% if preheading != blank or heading != blank or subheading != blank or button_1 != blank or button_2 != blank %}
+    <div class="caption is-justify-{{ text_horizontal_position }} is-align-{{ text_vertical_position }}">
+      <div class="caption-content text-align-{{ text_alignment }} {% if allow_padding %}has-padding{% endif %}">
+        {% if preheading != blank %}
+          <div class="{{ context }}__preheading banner__subheading subheading">
+            {{ preheading }}
+          </div>
+        {% endif %}
+        {% if heading != blank %}
+          <h2 class="{{ context }}__heading banner__heading title">
+            <span>{{ heading }}</span>
+          </h2>
+        {% endif %}
+        {% if subheading != blank %}
+          <div id="destination" class="{{ context }}__subheading banner__subheading subtitle">
+            {{ subheading }}
+          </div>
+        {% endif %}
+        {% if buttons %}
+          <div class="{{ context }}__buttons buttons is-{{ text_alignment }}">
+            {% if button_1 != blank %}
+              {% render 'button', label: button_1, href: button_1_link, type: 'link', style: button_1_style %}
+            {% endif %}
+            {% if button_2 != blank %}
+              {% render 'button', label: button_2, href: button_2_link, type: 'link', style: button_2_style %}
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</div>

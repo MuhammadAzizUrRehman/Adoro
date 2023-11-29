@@ -1,0 +1,35 @@
+{% render 'custom_menu_css' %}
+<aside class="mega-menu-custom">
+  <div class="mega-menu__wrapper">
+    <span class="icon icon--close mega-menu__close js-on-click js-mega-menu-close" data-onclick-target="html" data-onclick-class="mega-menu--open"></span>  
+        {% for link in settings.mega_menu.links %}  
+          {% for childlink in link.links %}
+        <div class="mega-menu__item js-mega-menu-item" data-item="{{ link.handle | handle }}">
+            <a href="{{ childlink.url }}"><h3 class="mega-menu__item-title animation-parent"> {{ childlink.title }} {% if forloop.index == 1 %} <span class="icon icon--arrow animation--go-to"></span>{% endif %}</h3></a>            
+          {% if childlink.links != blank %}
+          <ul class="mega-menu__item-products" data-collection="{{ link.handle | handle }}">  
+                {% for grandchildlink in childlink.links %}
+                <li class="mega-menu__item-product">                                  
+                  <a href="{{ grandchildlink.url }}" class="mega-menu__item-link js-mega-menu-product" data-handle="{{ grandchildlink.url | split: '/' | last }}">{{ grandchildlink.title }}</a>                  
+                </li>   
+                {% endfor %}
+          </ul>            
+          {% endif %}
+      </div>   
+       {% endfor %}
+      {% endfor %}
+  </div>
+  <div class="mega-menu__fade"></div>
+</aside>
+{% schema %}
+  {
+    "name": "custom menu",
+    "settings": []
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}
